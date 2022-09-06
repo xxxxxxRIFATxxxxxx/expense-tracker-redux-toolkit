@@ -10,6 +10,11 @@ export default function Transactions() {
         (state) => state.transaction
     );
 
+    const getLastFiveTransactions = () => {
+        const result = transactions.slice(Math.max(transactions.length - 5, 0));
+        return result;
+    };
+
     useEffect(() => {
         dispatch(fetchTransactions());
     }, [dispatch]);
@@ -22,7 +27,7 @@ export default function Transactions() {
         content = <p className="error">There was an error occured</p>;
 
     if (!isLoading && !isError && transactions?.length > 0) {
-        content = transactions.map((transaction) => (
+        content = getLastFiveTransactions().map((transaction) => (
             <Transaction key={transaction.id} transaction={transaction} />
         ));
     }

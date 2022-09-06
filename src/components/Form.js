@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
     changeTransaction,
-    createTransaction,
+    createTransaction
 } from "../features/transaction/transactionSlice";
 
 export default function Form() {

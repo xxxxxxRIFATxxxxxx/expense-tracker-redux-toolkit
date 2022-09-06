@@ -3,7 +3,7 @@ import {
     addTransaction,
     deleteTransaction,
     editTransaction,
-    getTransactions,
+    getTransactions
 } from "./transactionAPI";
 
 const initialState = {
