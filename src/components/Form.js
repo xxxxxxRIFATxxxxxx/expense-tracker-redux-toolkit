@@ -14,7 +14,7 @@ export default function Form() {
     const dispatch = useDispatch();
     const { isLoading, isError } = useSelector((state) => state.transaction);
     const { editing } = useSelector((state) => state.transaction) || {};
-
+ 
     // listen for edit mode active
     useEffect(() => {
         const { id, name, amount, type } = editing || {};
