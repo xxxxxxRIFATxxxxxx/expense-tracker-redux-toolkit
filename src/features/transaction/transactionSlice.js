@@ -2,8 +2,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import {
     addTransaction,
     deleteTransaction,
-    editTransaction,
-    getTransactions
+    editTransaction, getTransactions
 } from "./transactionAPI";
 
 const initialState = {
@@ -12,13 +11,17 @@ const initialState = {
     isError: false,
     error: "",
     editing: {},
+    page: 1,
+    limit: 10,
+    totalTransactions: 1,
+    filterMode: "all",
 };
 
 // async thunks
 export const fetchTransactions = createAsyncThunk(
     "transaction/fetchTransactions",
-    async () => {
-        const transactions = await getTransactions();
+    async ({page, limit, filterMode, searchText}) => {
+        const transactions = await getTransactions({page, limit, filterMode, searchText});
         return transactions;
     }
 );
@@ -58,6 +61,15 @@ const transactionSlice = createSlice({
         editInActive: (state) => {
             state.editing = {};
         },
+        updatePage: (state, action) => {
+            state.page = action.payload;
+        },
+        updateTotalTransactions: (state, action) => {
+            state.totalTransactions = action.payload;
+        },
+        updateFilterMode: (state, action) => {
+            state.filterMode = action.payload;
+        },
     },
     extraReducers: (builder) => {
         builder
@@ -68,7 +80,7 @@ const transactionSlice = createSlice({
             .addCase(fetchTransactions.fulfilled, (state, action) => {
                 state.isError = false;
                 state.isLoading = false;
-                state.transactions = action.payload;
+                state.transactions = action.payload.data;
             })
             .addCase(fetchTransactions.rejected, (state, action) => {
                 state.isLoading = false;
@@ -114,7 +126,6 @@ const transactionSlice = createSlice({
                 state.isLoading = true;
             })
             .addCase(removeTransaction.fulfilled, (state, action) => {
-                console.log(action);
                 state.isError = false;
                 state.isLoading = false;
 
@@ -131,4 +142,10 @@ const transactionSlice = createSlice({
 });
 
 export default transactionSlice.reducer;
-export const { editActive, editInActive } = transactionSlice.actions;
+export const { 
+    editActive, 
+    editInActive, 
+    updatePage, 
+    updateTotalTransactions,
+    updateFilterMode,
+} = transactionSlice.actions;

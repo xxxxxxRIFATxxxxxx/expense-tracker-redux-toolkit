@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { NavLink } from "react-router-dom";
-import { fetchTransactions } from "../../features/transaction/transactionSlice";
+import { fetchTransactions, updateFilterMode, updatePage, updateTotalTransactions } from "../../features/transaction/transactionSlice";
 import Transaction from "./Transaction";
 
 export default function Transactions() {
@@ -16,8 +16,19 @@ export default function Transactions() {
         return result;
     };
 
+    const handleSeeAllTransactions = () => {
+        dispatch(updatePage(1));
+        dispatch(updateFilterMode("all"));
+        dispatch(updateTotalTransactions(1));
+    };
+
     useEffect(() => {
-        dispatch(fetchTransactions());
+        dispatch(fetchTransactions({
+            page: "",
+            limit: "",
+            filterMode: "", 
+            searchText: "",
+        }));
     }, [dispatch]);
 
     // decide what to render
@@ -45,7 +56,7 @@ export default function Transactions() {
                 <ul>{content}</ul>
             </div>
 
-            <NavLink to="/all-transactions" className="custom-btn">See All Transaction</NavLink>
+            <NavLink to="/all-transactions" onClick={handleSeeAllTransactions} className="custom-btn">See All Transaction</NavLink>
         </>
     );
 }

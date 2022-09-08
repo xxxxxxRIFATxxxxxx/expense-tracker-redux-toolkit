@@ -1,52 +1,64 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchTransactions } from "../../features/transaction/transactionSlice";
+import { fetchTransactions, updateFilterMode, updatePage, updateTotalTransactions } from "../../features/transaction/transactionSlice";
 import Transaction from "./Transaction";
 
 export default function AllTransactions() {
-    const [ filterMode, setFilterMode ] = useState("all");
+    const [ searchText, setSearchText ] = useState("");
+    const [ searchMode, setSearchMode ] = useState(false);
 
-    const dispatch = useDispatch();
-
-    const { transactions, isLoading, isError } = useSelector(
+    const { transactions, page, limit, totalTransactions, filterMode, isLoading, isError } = useSelector(
         (state) => state.transaction
     );
 
+    const dispatch = useDispatch();
+
     const generatePaginationPage = () => {
-        let pages;
+        let pages = Math.ceil(totalTransactions / limit);
         let content = [];
 
-
-        if (filterMode === "all") {
-            pages = Math.ceil(transactions.length / 10);
-        }
-
-        else if (filterMode === "income") {
-            pages = Math.ceil(transactions.length / 10);
-        }
-
-        else if (filterMode === "expense") {
-            pages = Math.ceil(transactions.length / 10);
-        }
-
-        else if (filterMode === "search") {
-            pages = Math.ceil(transactions.length / 10);
-        };
-
         for (let i = 1; i <= pages; i++) {
-            content.push(<button key={Math.random()} className="custom-btn">{i}</button>)
+            content.push((
+                <button 
+                    key={Math.random()} 
+                    onClick={() => dispatch(updatePage(i))} 
+                    className="custom-btn"
+                    style={{marginRight: "10px"}}
+                >
+                    {i}
+                </button>
+            ))
         };
-
+        
         return content;
     };
 
     const handleFilterMode = (e) => {
-        setFilterMode(e.target.value);
+        dispatch(updatePage(1));
+        setSearchText("");
+        dispatch(updateFilterMode(e.target.value));
+    };
+
+    const handleSearchText = (e) => {
+        setSearchText(e.target.value);
+    };
+
+    const handleFormSubmit = (e) => {
+        e.preventDefault();
+        dispatch(updatePage(1));
+        dispatch(updateFilterMode("search"));
+        setSearchMode(!searchMode);
     };
 
     useEffect(() => {
-        dispatch(fetchTransactions());
-    }, [dispatch]);
+        dispatch(fetchTransactions({
+            page: page,
+            limit: limit,
+            filterMode: filterMode, 
+            searchText: searchText,
+        }))
+            .then(data => dispatch(updateTotalTransactions(data.payload.totalCount)))
+    }, [dispatch, filterMode, page, limit, totalTransactions, searchMode]);
 
     // decide what to render
     let content = null;
@@ -63,7 +75,7 @@ export default function AllTransactions() {
 
     if (!isLoading && !isError && transactions?.length === 0) {
         content = <p>No transactions found!</p>;
-    }
+    };
 
     return (
         <>
@@ -82,6 +94,12 @@ export default function AllTransactions() {
                     <input checked={filterMode === "all" ? true : false} onChange={handleFilterMode} type="radio" name="filterType" value="all" />
                     <span>All</span>
                 </div>
+            </div>
+
+            <div>
+                <form onSubmit={handleFormSubmit}>
+                    <input type="text" value={searchText} onChange={handleSearchText} />
+                </form>
             </div>
 
             <div className="conatiner_of_list_of_transactions">

@@ -1,4 +1,5 @@
 import { useDispatch } from "react-redux";
+import { NavLink } from "react-router-dom";
 import deleteImage from "../../assets/images/delete.svg";
 import editImage from "../../assets/images/edit.svg";
 import {
@@ -24,9 +25,9 @@ export default function Transaction({ transaction }) {
             <p>{name}</p>
             <div className="right">
                 <p>৳ {numberWithCommas(amount)}</p>
-                <button className="link" onClick={handleEdit}>
+                <NavLink to="/" className="link" onClick={handleEdit}>
                     <img alt="Edit" className="icon" src={editImage} />
-                </button>
+                </NavLink>
                 <button className="link" onClick={handleDelete}>
                     <img alt="Delete" className="icon" src={deleteImage} />
                 </button>
